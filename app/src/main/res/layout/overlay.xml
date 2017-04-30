@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="88dp"
+        android:background="@color/colorOverlay">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="@drawable/overlay_borders_top"
+            android:layout_gravity="bottom"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="30sp"
+            android:text="OKHear"
+            android:fontFamily="serif-medium"
+            android:textAlignment="center"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="32dp"/>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/colorOverlay"
+        android:layout_gravity="bottom">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="@drawable/overlay_borders_bottom" />
+
+    </FrameLayout>
+
+</merge>
