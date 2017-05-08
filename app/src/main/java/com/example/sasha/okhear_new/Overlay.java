@@ -29,6 +29,12 @@ public class Overlay extends FrameLayout {
     @DimensionPixelOffsetRes(R.dimen.training_margin_end)
     int trainingMarginEnd;
 
+    @DimensionPixelOffsetRes(R.dimen.overlay_top_margin)
+    int topMargin;
+
+    @DimensionPixelOffsetRes(R.dimen.overlay_corners_height)
+    int cornersHeight;
+
     @ViewById(R.id.mode_button)
     FrameLayout modeButton;
 
@@ -50,7 +56,8 @@ public class Overlay extends FrameLayout {
     @ViewById(R.id.dynamic_button)
     Button dynamicButton;
 
-    Mode mode = Mode.TRAINING;
+    private Mode mode = Mode.TRAINING;
+    private boolean isHidden = false;
 
     public Overlay(Context context) {
         super(context);
@@ -71,10 +78,27 @@ public class Overlay extends FrameLayout {
         startColorAnimation();
     }
 
+    @Click(R.id.symbols_button)
+    void onSymbolsButtonClicked() {
+        startMovingAnimation();
+        getMainActivity().showRecyclerView(true, MainActivity.ComplexityMode.SYMBOLS);
+    }
+
+    @Click(R.id.words_button)
+    void onWordsButtonClicked() {
+        startMovingAnimation();
+        getMainActivity().showRecyclerView(true, MainActivity.ComplexityMode.WORDS);
+    }
+
+    @Click(R.id.dynamic_button)
+    void onDynamicButtonClicked() {
+        startMovingAnimation();
+    }
+
     private void startRotationAnimation() {
         modeButton.setEnabled(false);
         ValueAnimator rotationAnimator = ValueAnimator.ofFloat(0, 180);
-        rotationAnimator.setDuration(500);
+        rotationAnimator.setDuration(400);
         rotationAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -100,10 +124,10 @@ public class Overlay extends FrameLayout {
     }
 
     private void startColorAnimation() {
-        int startColor = (mode == Mode.TRAINING) ? examColor : trainColor;
-        int endColor = (mode == Mode.TRAINING) ? trainColor : examColor;
+        final int startColor = (mode == Mode.TRAINING) ? examColor : trainColor;
+        final int endColor = (mode == Mode.TRAINING) ? trainColor : examColor;
         ValueAnimator colorAnimator = ValueAnimator.ofArgb(startColor, endColor);
-        colorAnimator.setDuration(500);
+        colorAnimator.setDuration(400);
         colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
@@ -114,6 +138,30 @@ public class Overlay extends FrameLayout {
         colorAnimator.start();
     }
 
+    public void startMovingAnimation() {
+        final int startValue = isHidden ? getBottom() - cornersHeight : topMargin;
+        final int endValue = isHidden ? topMargin : getBottom() - cornersHeight;
+        ValueAnimator movingAnimator = ValueAnimator.ofInt(startValue, endValue);
+        movingAnimator.setDuration(300);
+        enableLevelsButtons(false);
+        movingAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int value = (int) animation.getAnimatedValue();
+                setY(value);
+                if (value == endValue) {
+                    if (!isHidden) {
+                        getMainActivity().showUpButton(true);
+                    } else {
+                        enableLevelsButtons(true);
+                    }
+                    isHidden = !isHidden;
+                }
+            }
+        });
+        movingAnimator.start();
+    }
+
     private void setMainColor(int color) {
         symbolsButton.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
         wordsButton.getBackground().setColorFilter(color, PorterDuff.Mode.SRC);
@@ -122,6 +170,12 @@ public class Overlay extends FrameLayout {
         modeButtonIcon.getBackground().setTint(color);
         modeButtonText.setTextColor(color);
         getMainActivity().setBackgroundColor(color);
+    }
+
+    private void enableLevelsButtons(boolean enable) {
+        symbolsButton.setEnabled(enable);
+        wordsButton.setEnabled(enable);
+        dynamicButton.setEnabled(enable);
     }
 
     private MainActivity getMainActivity() {

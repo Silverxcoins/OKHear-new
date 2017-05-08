@@ -11,4 +11,6 @@
     <dimen name="overlay_corners_height">16dp</dimen>
     <dimen name="app_name_text_size">30sp</dimen>
     <dimen name="levels_buttons_corners_radius">4dp</dimen>
+    <dimen name="overlay_top_margin">54dp</dimen>
+    <dimen name="up_button_top_position">80dp</dimen>
 </resources>

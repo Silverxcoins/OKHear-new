@@ -7,6 +7,13 @@
     android:background="@color/colorMainBackgroundTrain"
     android:id="@+id/main_layout">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/overlay_top_margin"
+        android:layout_marginBottom="@dimen/overlay_corners_height"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,14 +24,25 @@
         android:textAlignment="center"
         android:layout_marginTop="20dp"/>
 
+    <ImageView
+        android:id="@+id/up_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_up"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="@drawable/circle_stroke"
+        android:backgroundTint="@android:color/white"
+        android:padding="8dp"
+        android:layout_marginBottom="-48dp"/>
+
     <com.example.sasha.okhear_new.Overlay_
+        android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="54dp">
+        android:layout_marginTop="@dimen/overlay_top_margin">
 
         <include
-            layout="@layout/overlay"
-            android:id="@+id/overlay"/>
+            layout="@layout/overlay" />
 
     </com.example.sasha.okhear_new.Overlay_>
 

@@ -5,6 +5,7 @@
     <color name="colorMainBackgroundTrain">#5d8b9a</color>
     <!--<color name="colorMainBackgroundExam">#5d9a86</color>-->
     <color name="colorMainBackgroundExam">#7381a6</color>
+    <color name="colorLevelItem">#44FFFFFF</color>
     <color name="colorOverlay">#FFFFFF</color>
     <color name="colorAccent">#ffc06f</color>
 </resources>
