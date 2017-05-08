@@ -1,40 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <FrameLayout
+    <View
         android:layout_width="match_parent"
-        android:layout_height="88dp"
-        android:background="@color/colorOverlay">
+        android:layout_height="@dimen/overlay_corners_height"
+        android:background="@drawable/overlay_borders_top" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:background="@drawable/overlay_borders_top"
-            android:layout_gravity="bottom"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/okgest" />
 
-        <TextView
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        android:alpha="0.2"
+        android:background="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="@dimen/main_buttons_margin_horizontal"
+        android:layout_marginStart="@dimen/main_buttons_margin_horizontal"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/symbols_button"
             android:layout_width="match_parent"
+            android:layout_height="@dimen/main_button_height"
+            android:layout_marginBottom="@dimen/main_buttons_margin"
+            android:alpha="0.7"
+            android:background="@drawable/levels_buttons_background"
+            android:text="@string/symbols_name"
+            android:textAllCaps="false"
+            android:textColor="@color/colorOverlay"
+            android:textSize="@dimen/main_button_text_size" />
+
+        <Button
+            android:id="@+id/words_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/main_button_height"
+            android:layout_marginBottom="@dimen/main_buttons_margin"
+            android:alpha="0.8"
+            android:background="@drawable/levels_buttons_background"
+            android:text="@string/words_name"
+            android:textAllCaps="false"
+            android:textColor="@color/colorOverlay"
+            android:textSize="@dimen/main_button_text_size" />
+
+        <Button
+            android:id="@+id/dynamic_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/main_button_height"
+            android:alpha="0.9"
+            android:background="@drawable/levels_buttons_background"
+            android:text="@string/dynamic_name"
+            android:textAllCaps="false"
+            android:textColor="@color/colorOverlay"
+            android:textSize="@dimen/main_button_text_size" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="@dimen/star_diameter"
+        android:layout_height="@dimen/star_diameter"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:alpha="0.7"
+        android:background="@drawable/white_circle" />
+
+    <View
+        android:layout_width="@dimen/star_diameter"
+        android:layout_height="@dimen/star_diameter"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/ic_star"
+        android:backgroundTint="@color/colorAccent" />
+
+    <TextView
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="88dp"
+        android:background="@drawable/stars_number_background"
+        android:padding="4dp"
+        android:text="0"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp" />
+
+    <FrameLayout
+        android:id="@+id/mode_button"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/white_circle"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/mode_button_foreground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/circle_stroke"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:textSize="30sp"
-            android:text="OKHear"
-            android:fontFamily="serif-medium"
-            android:textAlignment="center"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="32dp"/>
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-    </FrameLayout>
+            <View
+                android:id="@+id/mode_button_icon"
+                android:layout_width="@dimen/tab_icon_diameter"
+                android:layout_height="@dimen/tab_icon_diameter"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="@dimen/training_margin_end"
+                android:background="@drawable/ic_training"
+                android:backgroundTint="@color/colorMainBackgroundTrain" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/colorOverlay"
-        android:layout_gravity="bottom">
+            <TextView
+                android:id="@+id/mode_button_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/training_string"
+                android:textColor="@color/colorMainBackgroundTrain" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:background="@drawable/overlay_borders_bottom" />
+        </LinearLayout>
 
     </FrameLayout>
 
