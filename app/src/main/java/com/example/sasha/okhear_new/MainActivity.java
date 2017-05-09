@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.example.sasha.okhear_new.camera.CameraScreen;
 import com.example.sasha.okhear_new.levels_recycler_view.DataSource;
 import com.example.sasha.okhear_new.levels_recycler_view.LevelsAdapter;
 import com.example.sasha.okhear_new.levels_recycler_view.SymbolsDataSource;
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
     @ViewById(R.id.list)
     RecyclerView recyclerView;
+
+    @ViewById(R.id.camera_screen)
+    CameraScreen cameraScreen;
 
     DataSource symbolsDataSource = new SymbolsDataSource();
     DataSource wordsDataSource = new WordsDataSource();
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             recyclerView.setLayoutManager(manager);
-            recyclerView.setAdapter(new LevelsAdapter(dataSource));
+            recyclerView.setAdapter(new LevelsAdapter(recyclerView, dataSource, cameraScreen, overlay.isTraining()));
             recyclerView.getAdapter().notifyDataSetChanged();
         }
     }
@@ -121,6 +125,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         animator.start();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!cameraScreen.isHidden()) {
+            cameraScreen.hideCamera();
+        } else if (overlay.isHidden()) {
+            showUpButton(false);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public enum ComplexityMode {

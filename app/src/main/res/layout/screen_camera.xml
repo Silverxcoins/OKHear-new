@@ -1,0 +1,56 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <SurfaceView
+        android:id="@+id/camera_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </SurfaceView>
+
+    <ImageView
+        android:id="@+id/iv"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:scaleType="fitXY"
+        android:layout_gravity="end"/>
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="#55ffffff"
+        android:layout_gravity="bottom"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"/>
+
+    <ImageView
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:transformPivotX="0dp"
+        android:transformPivotY="0dp"
+        android:scaleType="fitStart"/>
+
+    <View
+        android:id="@+id/back_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="96dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/ic_back"/>
+
+    <View
+        android:id="@+id/swap_button"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="96dp"
+        android:layout_gravity="bottom|end"
+        android:background="@drawable/ic_swap"/>
+
+    <com.example.sasha.okhear_new.camera.DetectedRectangles
+        android:id="@+id/detected_rectangles"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</merge>

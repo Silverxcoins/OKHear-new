@@ -95,6 +95,14 @@ public class Overlay extends FrameLayout {
         startMovingAnimation();
     }
 
+    public boolean isTraining() {
+        return mode == Mode.TRAINING;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
     private void startRotationAnimation() {
         modeButton.setEnabled(false);
         ValueAnimator rotationAnimator = ValueAnimator.ofFloat(0, 180);

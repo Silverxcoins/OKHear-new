@@ -6,10 +6,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 
+import com.example.sasha.okhear_new.MainActivity;
+
 public class StatusBarUtil {
 
-    public static void hideStatusBar(Activity activity) {
-        View decorView = activity.getWindow().getDecorView();
+    public static void hideStatusBar(Context context) {
+        View decorView = ((MainActivity) context).getWindow().getDecorView();
         int uiVisibility = decorView.getSystemUiVisibility();
         decorView.setSystemUiVisibility(uiVisibility | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }

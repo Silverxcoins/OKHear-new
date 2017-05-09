@@ -39,11 +39,24 @@
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/overlay_top_margin">
+        android:layout_marginTop="@dimen/overlay_top_margin"
+        android:clickable="true">
 
         <include
             layout="@layout/overlay" />
 
     </com.example.sasha.okhear_new.Overlay_>
+
+    <com.example.sasha.okhear_new.camera.CameraScreen_
+        android:id="@+id/camera_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:clickable="true">
+
+        <include
+            layout="@layout/screen_camera" />
+
+    </com.example.sasha.okhear_new.camera.CameraScreen_>
 
 </FrameLayout>
