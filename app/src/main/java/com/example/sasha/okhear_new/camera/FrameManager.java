@@ -49,9 +49,9 @@ public class FrameManager {
             List<byte[]> byteArrays = new ArrayList<>();
             for (Rect handRect : handsArray) {
                 BitmapWithCoords bitmapWithCoords = Utils.cropBitmap(bitmap, handRect);
-                if (frameProcessingListener != null) {
-                    frameProcessingListener.onHandBitmapCreated(bitmapWithCoords, handsArray);
-                }
+//                if (frameProcessingListener != null) {
+//                    frameProcessingListener.onHandBitmapCreated(bitmapWithCoords, handsArray);
+//                }
                 byteArrays.add(Utils.getSmallBitmapBytes(bitmapWithCoords.getBitmap()));
             }
             if (frameProcessingListener != null) {

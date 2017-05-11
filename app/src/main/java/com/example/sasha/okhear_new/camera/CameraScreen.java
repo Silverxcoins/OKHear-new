@@ -240,7 +240,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @Override
     public void onResponse(String response) {
         Log.d(TAG, "onResponse: " + response);
-        text.setText(response);
+//        text.setText(response);
         try {
             if (timeoutTimer != null) {
                 timeoutTimer.cancel();
