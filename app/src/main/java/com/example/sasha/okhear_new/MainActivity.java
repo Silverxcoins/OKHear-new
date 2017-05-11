@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     @ViewById(R.id.camera_screen)
     CameraScreen cameraScreen;
 
+    @ViewById(R.id.transparent_view)
+    View transparentView;
+
     DataSource symbolsDataSource = new SymbolsDataSource();
     DataSource wordsDataSource = new WordsDataSource();
 
@@ -136,6 +139,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    public void enableClick(boolean enable) {
+        transparentView.setVisibility(enable ? View.INVISIBLE : View.VISIBLE);
     }
 
     public enum ComplexityMode {

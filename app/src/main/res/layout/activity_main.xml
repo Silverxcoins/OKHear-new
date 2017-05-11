@@ -59,4 +59,11 @@
 
     </com.example.sasha.okhear_new.camera.CameraScreen_>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/transparent_view"
+        android:clickable="true"
+        android:visibility="invisible"/>
+
 </FrameLayout>

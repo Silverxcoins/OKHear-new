@@ -17,6 +17,9 @@ import java.io.ByteArrayOutputStream;
 
 @SuppressWarnings("deprecation")
 public class Utils {
+
+    private static String symbols = "0123456789АБВГДЕЖЗИЙ";
+
     public static void setVisibility(View view, boolean visible) {
         view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
@@ -84,5 +87,15 @@ public class Utils {
             matrix.postScale(-1, 1, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
         }
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    public static int getSymbolPosition(char symbol) {
+        String s = String.valueOf(symbol).toUpperCase();
+        for (char c : symbols.toCharArray()) {
+            if (String.valueOf(c).equals(s)) {
+                return  symbols.indexOf(c);
+            }
+        }
+        return 0;
     }
 }

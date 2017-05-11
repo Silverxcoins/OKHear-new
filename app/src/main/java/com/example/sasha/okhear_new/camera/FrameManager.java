@@ -13,6 +13,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import org.opencv.objdetect.CascadeClassifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EBean(scope = EBean.Scope.Singleton)
 public class FrameManager {
 
@@ -21,7 +24,7 @@ public class FrameManager {
     public interface FrameProcessingListener {
         void onHandBitmapCreated(BitmapWithCoords bitmapWithCoords, Rect[] handsArray);
 
-        void onHandBytesReady(byte[] bytes);
+        void onHandsBytesReady(List<byte[]> bytes);
     }
 
     private FrameProcessingListener frameProcessingListener;
@@ -41,12 +44,18 @@ public class FrameManager {
             detector.detectMultiScale(gray, hands, 1.15, 25, 2, new Size(HAND_SIZE, HAND_SIZE), new Size());
         }
         Rect[] handsArray = hands.toArray();
-        org.opencv.android.Utils.matToBitmap(rgba, bitmap);
         if (handsArray.length > 0) {
-            BitmapWithCoords bitmapWithCoords = Utils.cropBitmap(bitmap, handsArray[0]);
+            org.opencv.android.Utils.matToBitmap(rgba, bitmap);
+            List<byte[]> byteArrays = new ArrayList<>();
+            for (Rect handRect : handsArray) {
+                BitmapWithCoords bitmapWithCoords = Utils.cropBitmap(bitmap, handRect);
+                if (frameProcessingListener != null) {
+                    frameProcessingListener.onHandBitmapCreated(bitmapWithCoords, handsArray);
+                }
+                byteArrays.add(Utils.getSmallBitmapBytes(bitmapWithCoords.getBitmap()));
+            }
             if (frameProcessingListener != null) {
-                frameProcessingListener.onHandBitmapCreated(bitmapWithCoords, handsArray);
-                frameProcessingListener.onHandBytesReady(Utils.getSmallBitmapBytes(bitmapWithCoords.getBitmap()));
+                frameProcessingListener.onHandsBytesReady(byteArrays);
             }
         }
     }

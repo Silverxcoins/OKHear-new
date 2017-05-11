@@ -6,7 +6,7 @@ import java.util.List;
 public class WordsDataSource extends DataSource {
 
     private final List<LevelItem> items = new ArrayList<>();
-    private String[] words = {"Еда", "Ваза", "Жиза", ""};
+    private String[] words = {"Еда", "Ваза", "Жиза", "Вбв", "Баба", "Ваза", ""};
 
     {
         for (String word : words) {

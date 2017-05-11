@@ -18,7 +18,7 @@
         android:layout_height="72dp"
         android:background="#55ffffff"
         android:layout_gravity="bottom"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textColor="@android:color/white"
         android:gravity="center"/>
 
@@ -53,4 +53,18 @@
         android:id="@+id/detected_rectangles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    <FrameLayout
+        android:id="@+id/done"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#AA000000"
+        android:visibility="invisible">
+        <View
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_done"
+            android:backgroundTint="#CCFFFFFF"/>
+    </FrameLayout>
 </merge>

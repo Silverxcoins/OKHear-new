@@ -2,19 +2,22 @@ package com.example.sasha.okhear_new.camera;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.sasha.okhear_new.MainActivity;
 import com.example.sasha.okhear_new.R;
 import com.example.sasha.okhear_new.utils.StatusBarUtil;
 
@@ -36,10 +39,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@SuppressWarnings("deprecation")
 @EViewGroup
 public class CameraScreen extends FrameLayout implements ServerCommunication.Callback, FrameManager.FrameProcessingListener {
 
@@ -55,6 +60,9 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @ViewById(R.id.text)
     TextView text;
 
+    @ViewById(R.id.done)
+    FrameLayout done;
+
     @ViewById(R.id.detected_rectangles)
     DetectedRectangles detectedRectangles;
 
@@ -67,6 +75,9 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @Bean
     FrameManager frameManager;
 
+    @Bean
+    Hints hints;
+
     Timer timeoutTimer;
 
     private static final String TAG = "CameraScreen";
@@ -75,7 +86,12 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     private Camera camera;
     private int cameraId;
 
+    private String allSymbols;
+    private int currentSymbolIndex;
+
     private boolean isHidden = true;
+
+    private boolean withHint;
 
     private final ThreadLocal<File> cascadeFile = new ThreadLocal<>();
     private CascadeClassifier javaDetector;
@@ -103,6 +119,44 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         }
     };
 
+    private SurfaceHolder.Callback callback = new SurfaceHolder.Callback() {
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        }
+        @Override
+        public void surfaceCreated(final SurfaceHolder holder) {
+            if (camera == null) {
+                camera = Camera.open();
+            }
+            cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+            try {
+                camera.setPreviewDisplay(holder);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Camera.Size previewSize = camera.getParameters().getPreviewSize();
+            float aspect = (float) previewSize.width / previewSize.height;
+            int previewSurfaceHeight = cameraView.getHeight();
+            camera.setDisplayOrientation(90);
+            cameraView.getLayoutParams().height = previewSurfaceHeight;
+            cameraView.getLayoutParams().width = (int) (previewSurfaceHeight / aspect);
+
+            Camera.Parameters params = camera.getParameters();
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            camera.setParameters(params);
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            if (camera != null) {
+                camera.setPreviewCallback(null);
+                camera.stopPreview();
+                camera.release();
+                camera = null;
+            }
+        }
+    };
+
     public CameraScreen(Context context) {
         super(context);
     }
@@ -118,43 +172,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @AfterViews
     public void init() {
         surfaceHolder = cameraView.getHolder();
-        surfaceHolder.addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            }
-            @Override
-            public void surfaceCreated(final SurfaceHolder holder) {
-                if (camera == null) {
-                    camera = Camera.open();
-                }
-                cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-                try {
-                    camera.setPreviewDisplay(holder);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Camera.Size previewSize = camera.getParameters().getPreviewSize();
-                float aspect = (float) previewSize.width / previewSize.height;
-                int previewSurfaceHeight = cameraView.getHeight();
-                camera.setDisplayOrientation(90);
-                cameraView.getLayoutParams().height = previewSurfaceHeight;
-                cameraView.getLayoutParams().width = (int) (previewSurfaceHeight / aspect);
-
-                Camera.Parameters params = camera.getParameters();
-                params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-                camera.setParameters(params);
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-                if (camera != null) {
-                    camera.setPreviewCallback(null);
-                    camera.stopPreview();
-                    camera.release();
-                    camera = null;
-                }
-            }
-        });
+        surfaceHolder.addCallback(callback);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
 
@@ -191,7 +209,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
             });
         } else {
             frameManager.setFrameProcessingListener(null);
-            camera.setOneShotPreviewCallback(null);
+            camera.setPreviewCallback(null);
             imagesServerCommunication.setCallback(null);
         }
     }
@@ -211,11 +229,10 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         iv.setImageBitmap(bitmapWithCoords.getBitmap());
     }
 
-    @UiThread
     @Override
-    public void onHandBytesReady(byte[] bytes) {
+    public void onHandsBytesReady(List<byte[]> bytes) {
         if (bytes != null) {
-            imagesServerCommunication.sendToServerWithSocket(bytes);
+            imagesServerCommunication.sendToServerWithSocket(allSymbols.charAt(currentSymbolIndex), bytes);
         }
     }
 
@@ -223,6 +240,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @Override
     public void onResponse(String response) {
         Log.d(TAG, "onResponse: " + response);
+        text.setText(response);
         try {
             if (timeoutTimer != null) {
                 timeoutTimer.cancel();
@@ -234,31 +252,68 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
                     readyToSend.set(true);
                 }
             }, 400);
+
             JSONObject json = new JSONObject(response);
+            String s = json.getString("gesture_max_val");
+            float f = Float.valueOf(s);
+            if (f > 0.05f) {
+                Log.d(TAG, "onResponse: !!! " + f);
+                if (currentSymbolIndex < allSymbols.length() - 1) {
+                    currentSymbolIndex++;
+                    changeSymbol();
+                } else {
+                    showDoneView(true);
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            hideCamera();
+                        }
+                    }, 1000);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @UiThread
+    void showDoneView(boolean show) {
+        done.setVisibility(show ? VISIBLE : INVISIBLE);
+    }
+
+    @UiThread
     public void hideCamera() {
-        isHidden = true;
-        startMovingAnimation();
-        startSendingFrames(false);
+        if (!isHidden()) {
+            isHidden = true;
+            startMovingAnimation();
+            startSendingFrames(false);
+            camera.stopPreview();
+        }
     }
 
     public void showCamera(String text, boolean withHint) {
-        isHidden = false;
-        StatusBarUtil.hideStatusBar(getContext());
-        setVisibility(VISIBLE);
-        setX(0);
-        hint.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.be));
-        startScaleAnimation();
-        camera.startPreview();
-        this.text.setText(text);
-        startSendingFrames(true);
+        if (isHidden()) {
+            this.allSymbols = text;
+            this.currentSymbolIndex = 0;
+            this.withHint = withHint;
+            isHidden = false;
+            setVisibility(VISIBLE);
+            setX(0);
+            camera.startPreview();
+            this.text.setText(text);
+            changeSymbol();
+            startScaleAnimation();
+            try {
+                initDetector();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            startSendingFrames(true);
+        }
     }
 
     private void startMovingAnimation() {
+        ((MainActivity) getContext()).enableClick(false);
         ValueAnimator animator = ValueAnimator.ofInt(0, getRight());
         animator.setDuration(300);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -268,7 +323,8 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
                 setX(value);
                 if (value == getRight()) {
                     camera.stopPreview();
-                    StatusBarUtil.hideStatusBar(getContext());
+                    showDoneView(false);
+                    ((MainActivity) getContext()).enableClick(true);
                 }
             }
         });
@@ -291,12 +347,26 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         animator.start();
     }
 
+    private void changeSymbol() {
+        final SpannableStringBuilder text = new SpannableStringBuilder(allSymbols);
+        final ForegroundColorSpan style = new ForegroundColorSpan(Color.rgb(255, 0, 0));
+        text.setSpan(style, currentSymbolIndex, currentSymbolIndex + 1, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        this.text.setText(text);
+        if (withHint) {
+            hint.setImageBitmap(BitmapFactory.decodeResource(getResources(), hints.get(allSymbols.charAt(currentSymbolIndex))));
+        } else {
+            hint.setImageBitmap(null);
+        }
+    }
+
     public boolean isHidden() {
         return isHidden;
     }
 
     public void swapCamera() {
         camera.stopPreview();
+        startSendingFrames(false);
+        surfaceHolder.removeCallback(callback);
         camera.release();
 
         if (cameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
@@ -313,6 +383,8 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
             e.printStackTrace();
         }
         camera.startPreview();
+        surfaceHolder.addCallback(callback);
+        startSendingFrames(true);
     }
 
     @Override
@@ -332,7 +404,11 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     private void initDetector() throws IOException {
         InputStream is = getResources().openRawResource(R.raw.cascade_right_letters);
         File cascadeDir = getContext().getDir("cascade", Context.MODE_PRIVATE);
-        cascadeFile.set(new File(cascadeDir, "cascade_right_letters.xml"));
+        String cascadeFileName = "cascade_right_letters.xml";
+        if (allSymbols != null && (allSymbols.charAt(currentSymbolIndex) == 'З' || allSymbols.charAt(currentSymbolIndex) == 'з')) {
+            cascadeFileName = "cascade_z_900.xml";
+        }
+        cascadeFile.set(new File(cascadeDir, cascadeFileName));
         FileOutputStream os = new FileOutputStream(cascadeFile.get());
         byte[] buffer = new byte[4096];
         int bytesRead;
