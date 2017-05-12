@@ -256,7 +256,8 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
             JSONObject json = new JSONObject(response);
             String s = json.getString("gesture_max_val");
             float f = Float.valueOf(s);
-            if (f > 0.05f) {
+            float thresholdValue = (allSymbols.charAt(currentSymbolIndex) == 'А' || allSymbols.charAt(currentSymbolIndex) == 'а') ? 0.001f : 0.03f;
+            if (f > thresholdValue) {
                 Log.d(TAG, "onResponse: !!! " + f);
                 if (currentSymbolIndex < allSymbols.length() - 1) {
                     currentSymbolIndex++;
