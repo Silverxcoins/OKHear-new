@@ -6,7 +6,7 @@ import java.util.List;
 public class SymbolsDataSource extends DataSource {
 
     private final List<LevelItem> items = new ArrayList<>();
-    private String symbolsString = "АБВГДЕЖЗИЙ1234567890 ";
+    private String symbolsString = "0123456789АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЫЬЭЮЯ ";
 
     {
         for (char c : symbolsString.toCharArray()) {

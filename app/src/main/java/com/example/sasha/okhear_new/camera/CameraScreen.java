@@ -406,8 +406,15 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         InputStream is = getResources().openRawResource(R.raw.cascade_right_letters);
         File cascadeDir = getContext().getDir("cascade", Context.MODE_PRIVATE);
         String cascadeFileName = "cascade_right_letters.xml";
-        if (allSymbols != null && (allSymbols.charAt(currentSymbolIndex) == 'З' || allSymbols.charAt(currentSymbolIndex) == 'з')) {
-            cascadeFileName = "cascade_z_900.xml";
+        if (allSymbols != null) {
+            if (allSymbols.charAt(currentSymbolIndex) == 'З' || allSymbols.charAt(currentSymbolIndex) == 'з') {
+                cascadeFileName = "cascade_z_900.xml";
+            } else if (allSymbols.charAt(currentSymbolIndex) == 'Л' || allSymbols.charAt(currentSymbolIndex) == 'л'
+                    || allSymbols.charAt(currentSymbolIndex) == 'М' || allSymbols.charAt(currentSymbolIndex) == 'м'
+                    || allSymbols.charAt(currentSymbolIndex) == 'Т' || allSymbols.charAt(currentSymbolIndex) == 'т'
+                    || allSymbols.charAt(currentSymbolIndex) == 'П' || allSymbols.charAt(currentSymbolIndex) == 'п') {
+                cascadeFileName = "cascade_lmpt.xml";
+            }
         }
         cascadeFile.set(new File(cascadeDir, cascadeFileName));
         FileOutputStream os = new FileOutputStream(cascadeFile.get());
