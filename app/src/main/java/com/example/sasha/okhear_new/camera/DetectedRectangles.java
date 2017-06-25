@@ -52,10 +52,10 @@ public class DetectedRectangles extends View {
         if (this.rects != null) {
             this.rects.clear();
             for (Rect rect : rects) {
-                this.rects.add(new RectF(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height));
+                this.rects.add(new RectF(rect.x * 3, rect.y * 3, rect.x * 3 + rect.width * 3, rect.y * 3 + rect.height * 3));
             }
-            this.croppedRect = new RectF(croppedRect.x, croppedRect.y,
-                    croppedRect.x + croppedRect.width, croppedRect.y + croppedRect.height);
+            this.croppedRect = new RectF(croppedRect.x * 3, croppedRect.y * 3,
+                    croppedRect.x * 3 + croppedRect.width * 3, croppedRect.y * 3 + croppedRect.height * 3);
             invalidate();
         }
     }

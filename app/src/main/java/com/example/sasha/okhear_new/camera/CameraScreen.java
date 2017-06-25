@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.sasha.okhear_new.MainActivity;
 import com.example.sasha.okhear_new.R;
 import com.example.sasha.okhear_new.utils.StatusBarUtil;
+import com.example.sasha.okhear_new.utils.Utils;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -28,6 +29,7 @@ import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DrawableRes;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -65,6 +67,9 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
 
     @ViewById(R.id.detected_rectangles)
     DetectedRectangles detectedRectangles;
+
+    @ViewById(R.id.sort)
+    TextView sortText;
 
     @DrawableRes(R.drawable.be)
     Drawable be;
@@ -224,7 +229,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
                 (int) bitmapWithCoords.getWidth(),
                 (int) bitmapWithCoords.getHeight()
         );
-//        detectedRectangles.setRectangles(rects, croppedRect);
+        detectedRectangles.setRectangles(rects, croppedRect);
 
         iv.setImageBitmap(bitmapWithCoords.getBitmap());
     }
@@ -253,25 +258,33 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
                 }
             }, 400);
 
-            JSONObject json = new JSONObject(response);
-            String s = json.getString("gesture_max_val");
-            float f = Float.valueOf(s);
-            float thresholdValue = (allSymbols.charAt(currentSymbolIndex) == 'А' || allSymbols.charAt(currentSymbolIndex) == 'а') ? 0.001f : 0.001f;
-            if (f > thresholdValue) {
-                Log.d(TAG, "onResponse: !!! " + f);
-                if (currentSymbolIndex < allSymbols.length() - 1) {
-                    currentSymbolIndex++;
-                    changeSymbol();
-                } else {
-                    showDoneView(true);
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            hideCamera();
-                        }
-                    }, 1000);
-                }
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray array = jsonObject.getJSONArray("gesture_ordered_classes");
+            String s = "";
+            for (int i = 0; i < array.length(); i++) {
+                s += Utils.getSymbolByPosition(array.getInt(i));
             }
+            sortText.setText(s);
+//
+//            JSONObject json = new JSONObject(response);
+//            String s = json.getString("gesture_max_val");
+//            float f = Float.valueOf(s);
+//            float thresholdValue = (allSymbols.charAt(currentSymbolIndex) == 'А' || allSymbols.charAt(currentSymbolIndex) == 'а') ? 0.001f : 0.001f;
+//            if (f > thresholdValue) {
+//                Log.d(TAG, "onResponse: !!! " + f);
+//                if (currentSymbolIndex < allSymbols.length() - 1) {
+//                    currentSymbolIndex++;
+//                    changeSymbol();
+//                } else {
+//                    showDoneView(true);
+//                    new Timer().schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            hideCamera();
+//                        }
+//                    }, 1000);
+//                }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }

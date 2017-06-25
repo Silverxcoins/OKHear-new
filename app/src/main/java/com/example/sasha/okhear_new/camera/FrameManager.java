@@ -36,28 +36,28 @@ public class FrameManager {
     @Background
     public void detectHand(byte[] bytes, Camera camera, CascadeClassifier detector, boolean isFrontCamera) {
         Bitmap bitmap = Utils.frameBytesToBitmap(camera, bytes, isFrontCamera);
-//        Mat rgba = new Mat();
-//        org.opencv.android.Utils.bitmapToMat(bitmap, rgba);
-//        Mat gray = Utils.convertToGrayColors(rgba);
-//        MatOfRect hands = new MatOfRect();
-//        if (detector != null) {
-//            detector.detectMultiScale(gray, hands, 1.15, 25, 2, new Size(HAND_SIZE, HAND_SIZE), new Size());
-//        }
-//        Rect[] handsArray = hands.toArray();
-//        if (handsArray.length > 0) {
-//            org.opencv.android.Utils.matToBitmap(rgba, bitmap);
+        Mat rgba = new Mat();
+        org.opencv.android.Utils.bitmapToMat(bitmap, rgba);
+        Mat gray = Utils.convertToGrayColors(rgba);
+        MatOfRect hands = new MatOfRect();
+        if (detector != null) {
+            detector.detectMultiScale(gray, hands, 1.15, 25, 2, new Size(HAND_SIZE, HAND_SIZE), new Size());
+        }
+        Rect[] handsArray = hands.toArray();
+        if (handsArray.length > 0) {
+            org.opencv.android.Utils.matToBitmap(rgba, bitmap);
             List<byte[]> byteArrays = new ArrayList<>();
-//            for (Rect handRect : handsArray) {
-//                BitmapWithCoords bitmapWithCoords = Utils.cropBitmap(bitmap, handRect);
-//                if (frameProcessingListener != null) {
-//                    frameProcessingListener.onHandBitmapCreated(bitmapWithCoords, handsArray);
-//                }
+            for (Rect handRect : handsArray) {
+                BitmapWithCoords bitmapWithCoords = Utils.cropBitmap(bitmap, handRect);
+                if (frameProcessingListener != null) {
+                    frameProcessingListener.onHandBitmapCreated(bitmapWithCoords, handsArray);
+                }
                 byteArrays.add(Utils.getSmallBitmapBytes(bitmap));
-//            }
+            }
             if (frameProcessingListener != null) {
                 frameProcessingListener.onHandsBytesReady(byteArrays);
             }
-//        }
+        }
     }
 
     public static class BitmapWithCoords {

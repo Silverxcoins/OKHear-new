@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream;
 @SuppressWarnings("deprecation")
 public class Utils {
 
-    private static String symbols = "0123456789АБВГДЕЖЗИЙ";
+    private static String symbols = "0123456789АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЫЬЭЮЯ";
 
     public static void setVisibility(View view, boolean visible) {
         view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
@@ -97,5 +97,9 @@ public class Utils {
             }
         }
         return 0;
+    }
+
+    public static char getSymbolByPosition(int position) {
+        return symbols.charAt(position);
     }
 }
