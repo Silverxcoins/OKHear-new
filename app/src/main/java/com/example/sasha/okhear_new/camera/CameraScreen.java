@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import com.example.sasha.okhear_new.MainActivity;
 import com.example.sasha.okhear_new.R;
+import com.example.sasha.okhear_new.symbols_processing.SymbolsDelays;
+import com.example.sasha.okhear_new.symbols_processing.SymbolsProcessingController;
+import com.example.sasha.okhear_new.symbols_processing.SymbolsSuccessNumber;
 import com.example.sasha.okhear_new.utils.StatusBarUtil;
 import com.example.sasha.okhear_new.utils.Utils;
 
@@ -30,6 +33,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DrawableRes;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -41,7 +45,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Policy;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,6 +57,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SuppressWarnings("deprecation")
 @EViewGroup
 public class CameraScreen extends FrameLayout implements ServerCommunication.Callback, FrameManager.FrameProcessingListener {
+
+    private final static int SUCCESS_DELAY = 4000;
 
     @ViewById(R.id.camera_view)
     SurfaceView cameraView;
@@ -83,6 +93,9 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @Bean
     Hints hints;
 
+    @Bean
+    SymbolsProcessingController symbolsProcessingController;
+
     Timer timeoutTimer;
 
     private static final String TAG = "CameraScreen";
@@ -93,6 +106,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
 
     private String allSymbols;
     private int currentSymbolIndex;
+    private int successNumber = 0;
 
     private boolean isHidden = true;
 
@@ -102,6 +116,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     private CascadeClassifier javaDetector;
 
     AtomicBoolean readyToSend = new AtomicBoolean(true);
+    boolean successTimeExpired;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(getContext()) {
         @Override
@@ -196,12 +211,16 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
             frameManager.setFrameProcessingListener(this);
             imagesServerCommunication.setCallback(this);
             readyToSend.set(true);
+            startSuccessTimer();
             camera.setPreviewCallback(new Camera.PreviewCallback() {
                 @Override
                 public void onPreviewFrame(byte[] bytes, final Camera camera) {
                     if (readyToSend.get()) {
                         readyToSend.set(false);
-                        frameManager.detectHand(bytes, camera, javaDetector, isFrontCamera());
+//                        frameManager.detectHand(bytes, camera, javaDetector, isFrontCamera());
+                        List<byte[]> bytesList = new ArrayList<>();
+                        bytesList.add(Utils.getSmallBitmapBytes(Utils.frameBytesToBitmap(camera, bytes, isFrontCamera())));
+                        imagesServerCommunication.sendToServerWithSocket(' ', bytesList);
                         timeoutTimer = new Timer();
                         timeoutTimer.schedule(new TimerTask() {
                             @Override
@@ -241,58 +260,82 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         }
     }
 
+    private void startSuccessTimer() {
+        successTimeExpired = false;
+        char currentSymbol = allSymbols.charAt(currentSymbolIndex);
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                successTimeExpired = true;
+                successNumber = 0;
+            }
+        }, SymbolsDelays.getDelay(currentSymbol));
+    }
+
     @UiThread
     @Override
     public void onResponse(String response) {
         Log.d(TAG, "onResponse: " + response);
-//        text.setText(response);
-        try {
-            if (timeoutTimer != null) {
-                timeoutTimer.cancel();
-                timeoutTimer = null;
+        if (timeoutTimer != null) {
+            timeoutTimer.cancel();
+            timeoutTimer = null;
+        }
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                readyToSend.set(true);
             }
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    readyToSend.set(true);
-                }
-            }, 400);
+        }, 400);
 
+        processServerResponse(response);
+    }
+
+    private void processServerResponse(String response) {
+        String sortedSymbols = "";
+        try {
             JSONObject jsonObject = new JSONObject(response);
-            JSONArray array = jsonObject.getJSONArray("gesture_ordered_classes");
-            String s = "";
-            for (int i = 0; i < array.length(); i++) {
-                s += Utils.getSymbolByPosition(array.getInt(i));
+            JSONArray sortedPositions = jsonObject.getJSONArray("gesture_ordered_classes");
+            for (int i = 0; i < sortedPositions.length(); i++) {
+                sortedSymbols += Utils.getSymbolByPosition(sortedPositions.getInt(i));
             }
-            sortText.setText(s);
-//
-//            JSONObject json = new JSONObject(response);
-//            String s = json.getString("gesture_max_val");
-//            float f = Float.valueOf(s);
-//            float thresholdValue = (allSymbols.charAt(currentSymbolIndex) == 'А' || allSymbols.charAt(currentSymbolIndex) == 'а') ? 0.001f : 0.001f;
-//            if (f > thresholdValue) {
-//                Log.d(TAG, "onResponse: !!! " + f);
-//                if (currentSymbolIndex < allSymbols.length() - 1) {
-//                    currentSymbolIndex++;
-//                    changeSymbol();
-//                } else {
-//                    showDoneView(true);
-//                    new Timer().schedule(new TimerTask() {
-//                        @Override
-//                        public void run() {
-//                            hideCamera();
-//                        }
-//                    }, 1000);
-//                }
-//            }
-        } catch (Exception e) {
+            sortText.setText(sortedSymbols);
+        } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        char currentSymbol = allSymbols.charAt(currentSymbolIndex);
+        boolean isSymbolValid = symbolsProcessingController.isSymbolValid(currentSymbol, sortedSymbols, isFrontCamera());
+        if (isSymbolValid) {
+            Log.d("sasha", "processServerResponse: " + successNumber);
+            if (successNumber >= SymbolsSuccessNumber.getSuccessNumber(currentSymbol) - 1) {
+                successNumber = 0;
+                if (currentSymbolIndex < allSymbols.length() - 1) {
+                    currentSymbolIndex++;
+                    changeSymbol();
+                } else {
+                    showDoneView(true);
+                }
+            } else {
+                successNumber++;
+            }
+        }
+        if (successTimeExpired) {
+            successTimeExpired = false;
+            startSuccessTimer();
         }
     }
 
     @UiThread
     void showDoneView(boolean show) {
         done.setVisibility(show ? VISIBLE : INVISIBLE);
+        if (show) {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    hideCamera();
+                }
+            }, 1000);
+        }
     }
 
     @UiThread
