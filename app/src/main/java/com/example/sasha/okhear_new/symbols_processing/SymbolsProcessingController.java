@@ -274,14 +274,39 @@ public class SymbolsProcessingController {
     private SymbolValidator aeValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Э');
+            if (sortedSymbols.indexOf('Е') <= 3 && sortedSymbols.indexOf('Е') <= symbolPos
+                    || sortedSymbols.indexOf('З') <= symbolPos
+                    || sortedSymbols.indexOf('К') <= symbolPos
+                    || sortedSymbols.indexOf('Ц') <= symbolPos) {
+                return false;
+            }
+            if (isFrontCamera) {
+                return symbolPos <= 3;
+            } else {
+                return symbolPos <= 1;
+            }
         }
     };
 
     private SymbolValidator yuValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ю');
+            if (sortedSymbols.indexOf('У') == 0
+                    || sortedSymbols.indexOf('О') <= 1 && sortedSymbols.indexOf('О') < symbolPos) {
+                return false;
+            }
+            if (isFrontCamera) {
+                if (sortedSymbols.indexOf('Ж') <= 4) {
+                    return false;
+                }
+            } else {
+                if (sortedSymbols.indexOf('Ж') <= 2 && sortedSymbols.indexOf('Ж') < symbolPos) {
+                    return false;
+                }
+            }
+            return symbolPos <= 1;
         }
     };
 
@@ -298,7 +323,7 @@ public class SymbolsProcessingController {
                         || sortedSymbols.indexOf('К') <= 3 && sortedSymbols.indexOf('К') < symbolPos) {
                     return false;
                 }
-                return symbolPos <= 5;
+                return symbolPos <= 4;
             } else {
                 return symbolPos <= 3;
             }

@@ -3,10 +3,6 @@ package com.example.sasha.okhear_new.symbols_processing;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Sasha on 27.06.17.
- */
-
 public class SymbolsSuccessNumber {
     private final static Map<Character, Integer> successNumbers = new HashMap<>();
 
