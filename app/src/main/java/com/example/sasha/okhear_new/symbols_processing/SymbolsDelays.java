@@ -38,7 +38,7 @@ public class SymbolsDelays {
         delays.put('Т', 4000);
         delays.put('У', 4000);
         delays.put('Ф', 4000);
-        delays.put('Х', 4000);
+        delays.put('Х', 5000);
         delays.put('Ц', 4000);
         delays.put('Ч', 4000);
         delays.put('Ш', 4000);

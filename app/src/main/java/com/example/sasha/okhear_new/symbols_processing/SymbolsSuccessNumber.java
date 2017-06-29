@@ -38,9 +38,9 @@ public class SymbolsSuccessNumber {
         successNumbers.put('Т', 3);
         successNumbers.put('У', 3);
         successNumbers.put('Ф', 3);
-        successNumbers.put('Х', 3);
+        successNumbers.put('Х', 2);
         successNumbers.put('Ц', 3);
-        successNumbers.put('Ч', 3);
+        successNumbers.put('Ч', 2);
         successNumbers.put('Ш', 3);
         successNumbers.put('Ы', 3);
         successNumbers.put('Ь', 3);
