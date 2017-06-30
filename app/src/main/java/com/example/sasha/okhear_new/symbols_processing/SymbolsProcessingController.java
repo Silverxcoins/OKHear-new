@@ -85,107 +85,235 @@ public class SymbolsProcessingController {
     private SymbolValidator aValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('А');
+            if (isFrontCamera) {
+                return symbolPos <= 2;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator beValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Б');
+            if (isFrontCamera) {
+                if (sortedSymbols.indexOf('П') <= 3  || sortedSymbols.indexOf('У') <= 4 ||
+                         sortedSymbols.indexOf('Т') <= 4 ) {
+                    return false;
+                } else {
+                    return symbolPos <= 5;
+                }
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator veValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('В');
+            if (isFrontCamera) {
+                return symbolPos <= 2;
+            } else {
+                return symbolPos <= 3;
+            }
+
         }
     };
 
     private SymbolValidator geValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Г');
+            if (isFrontCamera) {
+                return symbolPos <= 4;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator deValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Д');
+            if (isFrontCamera) {
+                if (sortedSymbols.indexOf('Э') <= 3  || sortedSymbols.indexOf('П') <= 4 ||
+                        sortedSymbols.indexOf('Ц') <= 4 || sortedSymbols.indexOf('Т') <= 4 ) {
+                    return false;
+                } else {
+                    return symbolPos <= 10;
+                }
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator eValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Е');
+            if (isFrontCamera) {
+                if (sortedSymbols.indexOf('Ы') <= 3  || sortedSymbols.indexOf('П') <= 4 ||
+                        sortedSymbols.indexOf('Ц') <= 4 || sortedSymbols.indexOf('Т') <= 4 ) {
+                    return false;
+                } else {
+                    return symbolPos <= 6;
+                }
+
+            } else {
+                return symbolPos <= 4;
+            }
         }
     };
 
     private SymbolValidator jeValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ж');
+            if (isFrontCamera) {
+                if (sortedSymbols.indexOf('Ы') <= 3  || sortedSymbols.indexOf('П') <= 4 ||
+                        sortedSymbols.indexOf('Ц') <= 4 || sortedSymbols.indexOf('Т') <= 4 ) {
+                    return false;
+                } else {
+                    return (sortedSymbols.indexOf('Ю') <= 5 && sortedSymbols.indexOf('Ж') <= 15);
+                }
+
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator zeValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('З');
+            if (isFrontCamera) {
+                return symbolPos <= 3;
+            } else {
+                return symbolPos <= 3;
+            }
+
         }
     };
 
     private SymbolValidator iValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('И');
+            if (isFrontCamera) {
+                if (sortedSymbols.indexOf('И') <= 4) {
+                    return true;
+                } else if (sortedSymbols.indexOf('П') <= 2 || sortedSymbols.indexOf('Т') <= 3) {
+                    return false;
+                } else {
+                    return (sortedSymbols.indexOf('О') <= 5 || sortedSymbols.indexOf('C') <= 6 ||
+                            sortedSymbols.indexOf('Ю') <= 6 && sortedSymbols.indexOf('И') <= 15);
+                }
+
+            } else {
+                if (sortedSymbols.indexOf('Ы') <= 3  || sortedSymbols.indexOf('П') <= 4 ||
+                        sortedSymbols.indexOf('Ц') <= 4 || sortedSymbols.indexOf('Т') <= 4 ) {
+                    return false;
+                } else if (sortedSymbols.indexOf('И') <= 4) {
+                    return true;
+                } else {
+                    return ((sortedSymbols.indexOf('О') <= 5 || sortedSymbols.indexOf('C') <= 6) &&
+                            sortedSymbols.indexOf('И') <= 15);
+                }
+
+            }
         }
     };
 
     private SymbolValidator ikratkayaValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Й');
+            if (isFrontCamera) {
+                if (symbolPos <= 5) {
+                    return true;
+                } else {
+                    return (sortedSymbols.indexOf('Ю') <= 5 &&  symbolPos <= 10);
+                }
+
+            } else {
+                return symbolPos <= 3 || (symbolPos <= 10 && sortedSymbols.indexOf('Р') <= 5);
+            }
         }
     };
 
     private SymbolValidator kValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('К');
+            if (isFrontCamera) {
+                return symbolPos <= 4;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator lValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Л');
+            if (isFrontCamera) {
+                return symbolPos <= 4;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator mValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('М');
+            if (isFrontCamera) {
+                return symbolPos <= 3;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator nValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Н');
+            if (isFrontCamera) {
+                return symbolPos <= 3;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator oValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('О');
+            if (isFrontCamera) {
+                if (symbolPos <= 4){
+                    return true;
+                } else {
+                    return (sortedSymbols.indexOf('Ю') <= 4 || sortedSymbols.indexOf('Ы') <= 4
+                            && symbolPos <= 10);
+                }
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
+
+    ///////////////////////////////////////////////////////////////////////////
 
     private SymbolValidator pValidator = new SymbolValidator() {
         @Override
@@ -260,14 +388,29 @@ public class SymbolsProcessingController {
     private SymbolValidator iiValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ы');
+            if (sortedSymbols.indexOf('Г') <= 1
+                    || sortedSymbols.indexOf('Р') <= 1
+                    || sortedSymbols.indexOf('Н') <= 1) {
+                return false;
+            }
+            return symbolPos <= 2;
         }
     };
 
     private SymbolValidator znakValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ь');
+            if (sortedSymbols.indexOf('Х') <= 1 && sortedSymbols.indexOf('З') < symbolPos) {
+                return false;
+            }
+            if (!isFrontCamera) {
+                if (sortedSymbols.indexOf('З') <= 1 && sortedSymbols.indexOf('З') < symbolPos) {
+                    return false;
+                }
+            }
+            return symbolPos <= 3;
         }
     };
 
