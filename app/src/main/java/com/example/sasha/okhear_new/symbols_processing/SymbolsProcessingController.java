@@ -1,5 +1,7 @@
 package com.example.sasha.okhear_new.symbols_processing;
 
+import android.util.Log;
+
 import org.androidannotations.annotations.EBean;
 
 import java.util.ArrayList;
@@ -346,42 +348,83 @@ public class SymbolsProcessingController {
     private SymbolValidator uValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('У');
+            if (sortedSymbols.indexOf('Э') <= 1) {
+                return false;
+            }
+            return symbolPos <= 2;
         }
     };
 
     private SymbolValidator fValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ф');
+            return symbolPos <= 3;
         }
     };
 
     private SymbolValidator hValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Х');
+            if (sortedSymbols.indexOf('Ь') <= 1 && sortedSymbols.indexOf('Ь') < symbolPos
+                    || sortedSymbols.indexOf('В') == 0
+                    || sortedSymbols.indexOf('Э') == 0) {
+                return false;
+            }
+            if (isFrontCamera) {
+                return symbolPos <= 5;
+            } else {
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator ceValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ц');
+            if (sortedSymbols.indexOf('Ы') == 0) {
+                return false;
+            }
+            if (isFrontCamera) {
+                return symbolPos <= 3;
+            } else {
+                return symbolPos <= 1;
+            }
         }
     };
 
     private SymbolValidator cheValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ч');
+            if (sortedSymbols.indexOf('А') <= 3
+                    || sortedSymbols.indexOf('Х') < symbolPos) {
+                return false;
+            }
+            if (isFrontCamera) {
+                return symbolPos <= 4;
+            } else {
+                if (sortedSymbols.indexOf('Ф') < symbolPos) {
+                    return false;
+                }
+                return symbolPos <= 3;
+            }
         }
     };
 
     private SymbolValidator shValidator = new SymbolValidator() {
         @Override
         public boolean isSymbolValid(List<Character> sortedSymbols, boolean isFrontCamera) {
-            return false;
+            int symbolPos = sortedSymbols.indexOf('Ш');
+            if (sortedSymbols.indexOf('В') < symbolPos
+                    || sortedSymbols.indexOf('К') < symbolPos
+                    || sortedSymbols.indexOf('А') <= 3) {
+                return false;
+            }
+            return symbolPos <= 2;
         }
     };
 
@@ -517,6 +560,7 @@ public class SymbolsProcessingController {
     }
 
     public boolean isSymbolValid(char symbol, String sortedSymbolsString, boolean isFrontCamera) {
+        Log.d("sasha", "isSymbolValid: " + sortedSymbolsString);
         SymbolValidator validator = symbolValidators.get(symbol);
         List<Character> sortedSymbols = new ArrayList<>();
         for (char c : sortedSymbolsString.toCharArray()) {
