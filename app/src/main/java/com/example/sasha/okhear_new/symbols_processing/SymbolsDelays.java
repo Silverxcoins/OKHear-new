@@ -1,5 +1,9 @@
 package com.example.sasha.okhear_new.symbols_processing;
 
+import android.util.Log;
+
+import com.example.sasha.okhear_new.utils.Utils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +54,6 @@ public class SymbolsDelays {
     }
 
     public static int getDelay(char symbol) {
-        return delays.get(symbol);
+        return delays.get(Utils.toUpperCase(symbol));
     }
 }

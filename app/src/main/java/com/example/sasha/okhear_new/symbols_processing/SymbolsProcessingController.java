@@ -2,6 +2,8 @@ package com.example.sasha.okhear_new.symbols_processing;
 
 import android.util.Log;
 
+import com.example.sasha.okhear_new.utils.Utils;
+
 import org.androidannotations.annotations.EBean;
 
 import java.util.ArrayList;
@@ -561,12 +563,15 @@ public class SymbolsProcessingController {
 
     public boolean isSymbolValid(char symbol, String sortedSymbolsString, boolean isFrontCamera) {
         Log.d("sasha", "isSymbolValid: " + sortedSymbolsString);
-        SymbolValidator validator = symbolValidators.get(symbol);
+        SymbolValidator validator = symbolValidators.get(Utils.toUpperCase(symbol));
         List<Character> sortedSymbols = new ArrayList<>();
         for (char c : sortedSymbolsString.toCharArray()) {
             sortedSymbols.add(c);
         }
-        return validator.isSymbolValid(sortedSymbols, isFrontCamera);
+        if (validator != null) {
+            return validator.isSymbolValid(sortedSymbols, isFrontCamera);
+        }
+        return false;
     }
     
     private interface SymbolValidator {

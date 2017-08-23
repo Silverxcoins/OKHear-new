@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import com.example.sasha.okhear_new.MainActivity;
 import com.example.sasha.okhear_new.R;
+import com.example.sasha.okhear_new.ScorePref;
+import com.example.sasha.okhear_new.ScorePref_;
 import com.example.sasha.okhear_new.symbols_processing.SymbolsDelays;
 import com.example.sasha.okhear_new.symbols_processing.SymbolsProcessingController;
 import com.example.sasha.okhear_new.symbols_processing.SymbolsSuccessNumber;
@@ -32,6 +34,7 @@ import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DrawableRes;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,6 +87,9 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     @DrawableRes(R.drawable.be)
     Drawable be;
 
+    @Pref
+    ScorePref_ scorePref;
+
     @Bean
     ServerCommunication imagesServerCommunication;
 
@@ -111,6 +117,9 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     private boolean isHidden = true;
 
     private boolean withHint;
+
+    private boolean inited;
+    private boolean surfaceCreated;
 
     private final ThreadLocal<File> cascadeFile = new ThreadLocal<>();
     private CascadeClassifier javaDetector;
@@ -145,25 +154,8 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         }
         @Override
         public void surfaceCreated(final SurfaceHolder holder) {
-            if (camera == null) {
-                camera = Camera.open();
-            }
-            cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-            try {
-                camera.setPreviewDisplay(holder);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Camera.Size previewSize = camera.getParameters().getPreviewSize();
-            float aspect = (float) previewSize.width / previewSize.height;
-            int previewSurfaceHeight = cameraView.getHeight();
-            camera.setDisplayOrientation(90);
-            cameraView.getLayoutParams().height = previewSurfaceHeight;
-            cameraView.getLayoutParams().width = (int) (previewSurfaceHeight / aspect);
-
-            Camera.Parameters params = camera.getParameters();
-            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            camera.setParameters(params);
+            surfaceCreated = true;
+            initSurface(holder);
         }
 
         @Override
@@ -189,11 +181,36 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
         super(context, attrs, defStyleAttr);
     }
 
-    @AfterViews
-    public void init() {
+    public void init(boolean afterPermission) {
         surfaceHolder = cameraView.getHolder();
         surfaceHolder.addCallback(callback);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        inited = true;
+        if (afterPermission) {
+            initSurface(surfaceHolder);
+        }
+    }
+
+    private void initSurface(SurfaceHolder holder) {
+        if (camera == null) {
+            camera = Camera.open();
+        }
+        cameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+        try {
+            camera.setPreviewDisplay(holder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Camera.Size previewSize = camera.getParameters().getPreviewSize();
+        float aspect = (float) previewSize.width / previewSize.height;
+        int previewSurfaceHeight = cameraView.getHeight();
+        camera.setDisplayOrientation(90);
+        cameraView.getLayoutParams().height = previewSurfaceHeight;
+        cameraView.getLayoutParams().width = (int) (previewSurfaceHeight / aspect);
+
+        Camera.Parameters params = camera.getParameters();
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        camera.setParameters(params);
     }
 
     @Click(R.id.back_button)
@@ -298,7 +315,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
             for (int i = 0; i < sortedPositions.length(); i++) {
                 sortedSymbols += Utils.getSymbolByPosition(sortedPositions.getInt(i));
             }
-            sortText.setText(sortedSymbols);
+            sortText.setText(sortedSymbols.substring(0, 10));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -310,11 +327,11 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
             if (successNumber >= SymbolsSuccessNumber.getSuccessNumber(currentSymbol) - 1) {
                 successNumber = 0;
                 if (currentSymbolIndex < allSymbols.length() - 1) {
-                    currentSymbolIndex++;
-                    changeSymbol();
+                    showDoneView(true, false);
                 } else {
-                    showDoneView(true);
+                    showDoneView(true, true);
                 }
+                scorePref.score().put(scorePref.score().get() + 1);
             } else {
                 successNumber++;
             }
@@ -326,15 +343,26 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
     }
 
     @UiThread
-    void showDoneView(boolean show) {
+    void showDoneView(boolean show, boolean close) {
         done.setVisibility(show ? VISIBLE : INVISIBLE);
         if (show) {
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    hideCamera();
-                }
-            }, 1000);
+            if (close) {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideCamera();
+                    }
+                }, 1000);
+            } else {
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentSymbolIndex++;
+                        changeSymbol();
+                        showDoneView(false, false);
+                    }
+                }, 1000);
+            }
         }
     }
 
@@ -350,6 +378,13 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
 
     public void showCamera(String text, boolean withHint) {
         if (isHidden()) {
+            if (camera == null) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             this.allSymbols = text;
             this.currentSymbolIndex = 0;
             this.withHint = withHint;
@@ -380,7 +415,7 @@ public class CameraScreen extends FrameLayout implements ServerCommunication.Cal
                 setX(value);
                 if (value == getRight()) {
                     camera.stopPreview();
-                    showDoneView(false);
+                    showDoneView(false, false);
                     ((MainActivity) getContext()).enableClick(true);
                 }
             }

@@ -2,7 +2,7 @@
     <string name="app_name">OKHear</string>
     <string name="symbols_name">Символы</string>
     <string name="words_name">Слова</string>
-    <string name="dynamic_name">Динамика</string>
+    <string name="dynamic_name">Азбука</string>
     <string name="training_string">Тренировка</string>
     <string name="exam_string">Экзамен</string>
 </resources>

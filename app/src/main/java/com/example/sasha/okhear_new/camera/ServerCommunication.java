@@ -113,7 +113,7 @@ public class ServerCommunication {
 
 
         try {
-            Socket socket = new Socket("62.109.1.48", 7000);
+            Socket socket = new Socket("149.154.67.185", 5000);
 
             try(InputStream in = socket.getInputStream();
                 OutputStream out = socket.getOutputStream()) {

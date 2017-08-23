@@ -80,6 +80,7 @@
         android:backgroundTint="@color/colorAccent" />
 
     <TextView
+        android:id="@+id/score"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

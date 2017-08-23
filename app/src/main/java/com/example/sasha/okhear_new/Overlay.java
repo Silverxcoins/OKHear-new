@@ -1,10 +1,13 @@
 package com.example.sasha.okhear_new;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -16,6 +19,7 @@ import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.ColorRes;
 import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 @EViewGroup
 public class Overlay extends FrameLayout {
@@ -55,6 +59,12 @@ public class Overlay extends FrameLayout {
 
     @ViewById(R.id.dynamic_button)
     Button dynamicButton;
+
+    @ViewById(R.id.score)
+    TextView score;
+
+    @Pref
+    ScorePref_ scorePref;
 
     private Mode mode = Mode.TRAINING;
     private boolean isHidden = false;
@@ -147,27 +157,21 @@ public class Overlay extends FrameLayout {
     }
 
     public void startMovingAnimation() {
+        score.setText(String.valueOf(scorePref.score().get()));
         final int startValue = isHidden ? getBottom() - cornersHeight : topMargin;
         final int endValue = isHidden ? topMargin : getBottom() - cornersHeight;
-        ValueAnimator movingAnimator = ValueAnimator.ofInt(startValue, endValue);
-        movingAnimator.setDuration(300);
-        enableLevelsButtons(false);
-        movingAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        setY(startValue);
+        animate().y(endValue).setDuration(300).withLayer().withEndAction(new Runnable() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int value = (int) animation.getAnimatedValue();
-                setY(value);
-                if (value == endValue) {
-                    if (!isHidden) {
-                        getMainActivity().showUpButton(true);
-                    } else {
-                        enableLevelsButtons(true);
-                    }
-                    isHidden = !isHidden;
+            public void run() {
+                if (!isHidden) {
+                    getMainActivity().showUpButton(true);
+                } else {
+                    enableLevelsButtons(true);
                 }
+                isHidden = !isHidden;
             }
-        });
-        movingAnimator.start();
+        }).setInterpolator(new AccelerateInterpolator()).start();
     }
 
     private void setMainColor(int color) {
@@ -193,5 +197,11 @@ public class Overlay extends FrameLayout {
     private enum Mode {
         TRAINING,
         EXAM
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        score.setText(String.valueOf(scorePref.score().get()));
     }
 }

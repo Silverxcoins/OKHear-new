@@ -1,10 +1,16 @@
 package com.example.sasha.okhear_new;
 
+import android.Manifest;
 import android.animation.ValueAnimator;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -22,7 +28,7 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.DimensionPixelOffsetRes;
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     @DimensionPixelOffsetRes(R.dimen.up_button_top_position)
     int upButtonPosition;
@@ -50,15 +56,32 @@ public class MainActivity extends AppCompatActivity {
 
     @AfterViews
     void init() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestCameraPermission();
+        } else {
+            cameraScreen.init(false);
+        }
         StatusBarUtil.setupFullscreenActivity(this);
     }
 
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 0) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                cameraScreen.init(true);
+            } else {
+                finish();
+            }
+        }
+    }
+
     public void showRecyclerView(boolean show, ComplexityMode complexityMode) {
-        if (!show) {
-            startTransparencyAnimation(false);
-        } else {
-            startTransparencyAnimation(true);
-            recyclerView.setVisibility(View.VISIBLE);
+        if (show) {
             DataSource dataSource = null;
             switch (complexityMode) {
                 case SYMBOLS:
@@ -113,18 +136,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                     upButton.setEnabled(true);
                 }
-            }
-        });
-        animator.start();
-    }
-
-    private void startTransparencyAnimation(boolean show) {
-        ValueAnimator animator = ValueAnimator.ofFloat(show ? 0 : 1, show ? 1 : 0);
-        animator.setDuration(500);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                recyclerView.setAlpha((float) animation.getAnimatedValue());
             }
         });
         animator.start();

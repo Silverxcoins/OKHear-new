@@ -1,5 +1,7 @@
 package com.example.sasha.okhear_new.symbols_processing;
 
+import com.example.sasha.okhear_new.utils.Utils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +52,6 @@ public class SymbolsSuccessNumber {
     }
 
     public static int getSuccessNumber(char symbol) {
-        return successNumbers.get(symbol);
+        return successNumbers.get(Utils.toUpperCase(symbol));
     }
 }

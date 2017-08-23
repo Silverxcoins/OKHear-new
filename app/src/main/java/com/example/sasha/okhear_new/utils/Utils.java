@@ -102,4 +102,9 @@ public class Utils {
     public static char getSymbolByPosition(int position) {
         return symbols.charAt(position);
     }
+
+    public static char toUpperCase(char c) {
+        String s = String.valueOf(c);
+        return s.toUpperCase().toCharArray()[0];
+    }
 }
